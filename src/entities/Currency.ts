@@ -1,4 +1,4 @@
-import { Field, Int, ObjectType } from 'type-graphql';
+import { Field, Float, Int, ObjectType } from 'type-graphql';
 import {
   BaseEntity,
   Column,
@@ -28,10 +28,11 @@ export class Currency extends BaseEntity {
     unique: true,
     // nullable: true,
   })
-  email!: string;
+  charCode!: string;
 
+  @Field(() => Float)
   @Column()
-  password!: string;
+  value!: number;
 
   @Field(() => String)
   @CreateDateColumn()
