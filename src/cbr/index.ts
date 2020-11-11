@@ -5,6 +5,15 @@ import iconv from 'iconv-lite';
 // import prisma from '../prisma';
 // import url from "url";
 
+type el = {
+  $: { ID: string };
+  NumCode: [string];
+  CharCode: [string];
+  Nominal: [string];
+  Name: [string];
+  Value: [string];
+};
+
 const dailyUrl = 'https://www.cbr.ru/scripts/XML_daily.asp';
 const dailyEnUrl = 'https://www.cbr.ru/scripts/XML_daily_eng.asp';
 
@@ -68,9 +77,10 @@ const cbr = (): void => {
       );
       // parse xml
       // console.log(decodedXmlBody);
+
       xmlParser.parseString(
         decodedXmlBody,
-        async (error: any, result: { ValCurs: { Valute: any[] } }) => {
+        async (error: any, result: { ValCurs: { Valute: el[] } }) => {
           if (result) {
             // const dateArray = result.ValCurs.$.Date.split(".").map(Number);
             // const date = new Date(dateArray[2], dateArray[1] - 1, dateArray[0], 12);
@@ -80,7 +90,7 @@ const cbr = (): void => {
             // console.dir(result.ValCurs.$.Date);
             // console.log(new Date());
             // console.dir(result.ValCurs.Valute.length);
-            result.ValCurs.Valute.forEach(async (element: any) => {
+            result.ValCurs.Valute.forEach(async (element: el) => {
               console.log(element);
               // await prisma.mutation.upsertCurrency({
               //   where: {
