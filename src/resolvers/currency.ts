@@ -69,4 +69,11 @@ export class CurrencyResolver {
       ...currency,
     }).save();
   }
+
+  @Mutation(() => Currency, { nullable: true })
+  async upsertCurrency(
+    @Arg('currency') currency: CurrencyInput
+  ): Promise<Currency | null> {
+    return await Currency.save(currency);
+  }
 }
