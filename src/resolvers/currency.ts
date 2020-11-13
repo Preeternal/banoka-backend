@@ -61,6 +61,16 @@ export class CurrencyResolver {
     return await Currency.findOne(id);
   }
 
+  @Mutation(() => Boolean, { nullable: true })
+  async deleteCurrency(@Arg('id') id: number): Promise<boolean> {
+    try {
+      await Currency.delete({ id });
+    } catch {
+      return false;
+    }
+    return true;
+  }
+
   @Mutation(() => Currency, { nullable: true })
   async createCurrency(
     @Arg('currency') currency: CurrencyInput
@@ -74,6 +84,8 @@ export class CurrencyResolver {
   async upsertCurrency(
     @Arg('currency') currency: CurrencyInput
   ): Promise<Currency | null> {
-    return await Currency.save(currency);
+    const curr = await Currency.findOne({ charCode: currency.charCode });
+    console.log('curr', curr);
+    return await Currency.save({ id: curr?.id, ...currency });
   }
 }
