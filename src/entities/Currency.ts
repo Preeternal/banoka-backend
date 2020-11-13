@@ -23,6 +23,10 @@ export class Currency extends BaseEntity {
   @Column({ unique: true, nullable: true })
   nameEng?: string;
 
+  @Field(() => Int)
+  @Column()
+  nominal!: number;
+
   @Field()
   @Column({
     unique: true,

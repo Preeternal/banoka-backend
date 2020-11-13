@@ -35,10 +35,13 @@ class CurrencyInput {
   @Column({ unique: true, nullable: true })
   nameEng: string;
 
+  @Field(() => Int)
+  @Column()
+  nominal: number;
+
   @Field()
   @Column({
     unique: true,
-    // nullable: true,
   })
   charCode!: string;
 
@@ -85,7 +88,16 @@ export class CurrencyResolver {
     @Arg('currency') currency: CurrencyInput
   ): Promise<Currency | null> {
     const curr = await Currency.findOne({ charCode: currency.charCode });
-    console.log('curr', curr);
-    return await Currency.save({ id: curr?.id, ...currency });
+    if (!curr) {
+      return await Currency.create({
+        ...currency,
+      }).save();
+    }
+    // return await Currency.update({ id: curr?.id }, { value: currency.value });
+    // console.log('curr', curr);
+    return await Currency.save({
+      id: curr?.id as number,
+      ...currency,
+    });
   }
 }
