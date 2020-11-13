@@ -31,7 +31,7 @@ class CurrencyInput {
   @Column({ unique: true })
   name!: string;
 
-  @Field()
+  @Field(() => String, { nullable: true })
   @Column({ unique: true, nullable: true })
   nameEng: string;
 
