@@ -86,18 +86,15 @@ export class CurrencyResolver {
   @Mutation(() => Currency, { nullable: true })
   async upsertCurrency(
     @Arg('currency') currency: CurrencyInput
-  ): Promise<Currency | null> {
+  ): Promise<Currency | undefined> {
     const curr = await Currency.findOne({ charCode: currency.charCode });
     if (!curr) {
       return await Currency.create({
         ...currency,
       }).save();
     }
-    // return await Currency.update({ id: curr?.id }, { value: currency.value });
-    // console.log('curr', curr);
-    return await Currency.save({
-      id: curr?.id as number,
-      ...currency,
-    });
+    await Currency.update(curr.id, currency);
+    const updated = await Currency.findOne(curr.id);
+    return updated;
   }
 }
