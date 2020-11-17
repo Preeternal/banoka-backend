@@ -15,10 +15,8 @@ import { GraphQLClient } from 'graphql-request';
 //   });
 // };
 
-const getClient = (jwt?: string): GraphQLClient => {
+export const getClient = (jwt?: string): GraphQLClient => {
   return new GraphQLClient('http://localhost:4000/graphql', {
     headers: { Authorization: `Bearer ${jwt}` },
   });
 };
-
-export default getClient;

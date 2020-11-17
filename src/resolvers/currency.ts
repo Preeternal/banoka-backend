@@ -9,24 +9,11 @@ import {
   Resolver,
 } from 'type-graphql';
 import { Column } from 'typeorm';
-// import { getConnection } from 'typeorm';
-
-// import {
-//   Arg,
-//   Ctx,
-//   Field,
-//   FieldResolver,
-//   Mutation,
-//   ObjectType,
-//   Query,
-//   Resolver,
-//   Root,
-// } from 'type-graphql';
 
 import { Currency } from '../entities/Currency';
 
 @InputType()
-class CurrencyInput {
+class CurrencyCreateInput {
   @Field()
   @Column({ unique: true })
   name!: string;
@@ -40,12 +27,52 @@ class CurrencyInput {
   nominal: number;
 
   @Field()
-  @Column({
-    unique: true,
-  })
+  @Column({ unique: true })
   charCode!: string;
 
   @Field(() => Float)
+  @Column()
+  value!: number;
+}
+
+@InputType()
+class CurrencyWhereUniqueInput {
+  @Field({ nullable: true })
+  @Column({ unique: true })
+  id: number;
+
+  @Field({ nullable: true })
+  @Column({ unique: true })
+  name!: string;
+
+  @Field(() => String, { nullable: true })
+  @Column({ unique: true, nullable: true })
+  nameEng: string;
+
+  @Field({ nullable: true })
+  @Column({ unique: true })
+  charCode!: string;
+}
+
+@InputType()
+class CurrencyUpdateInput {
+  @Field({ nullable: true })
+  @Column({ unique: true })
+  name: string;
+
+  @Field(() => String, { nullable: true })
+  @Column({ unique: true, nullable: true })
+  nameEng: string;
+
+  @Field(() => Int, { nullable: true })
+  @Column()
+  nominal: number;
+
+  @Field({ nullable: true })
+  @Column({ unique: true })
+  charCode!: string;
+
+  @Field(() => Float, { nullable: true })
   @Column()
   value!: number;
 }
@@ -76,25 +103,27 @@ export class CurrencyResolver {
 
   @Mutation(() => Currency, { nullable: true })
   async createCurrency(
-    @Arg('currency') currency: CurrencyInput
+    @Arg('data') data: CurrencyCreateInput
   ): Promise<Currency | null> {
     return await Currency.create({
-      ...currency,
+      ...data,
     }).save();
   }
 
   @Mutation(() => Currency, { nullable: true })
   async upsertCurrency(
-    @Arg('currency') currency: CurrencyInput
+    @Arg('where') where: CurrencyWhereUniqueInput,
+    @Arg('create', { nullable: true }) create: CurrencyCreateInput,
+    @Arg('update', { nullable: true }) update: CurrencyUpdateInput
   ): Promise<Currency | undefined> {
-    const curr = await Currency.findOne({ charCode: currency.charCode });
-    if (!curr) {
+    const currency = await Currency.findOne(where);
+    if (!currency) {
       return await Currency.create({
-        ...currency,
+        ...create,
       }).save();
     }
-    await Currency.update(curr.id, currency);
-    const updated = await Currency.findOne(curr.id);
+    await Currency.update(currency.id, update);
+    const updated = await Currency.findOne(currency.id);
     return updated;
   }
 }

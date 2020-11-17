@@ -35,7 +35,7 @@ export class Currency extends BaseEntity {
   charCode!: string;
 
   @Field(() => Float)
-  @Column()
+  @Column({ type: 'float' })
   value!: number;
 
   @Field(() => String)

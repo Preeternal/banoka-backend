@@ -1,4 +1,4 @@
-import { gql } from "apollo-boost";
+import { gql } from 'graphql-request';
 
 const createCurrency = gql`
   mutation($data: CurrencyCreateInput!) {
@@ -88,5 +88,5 @@ export {
   getCurrencies,
   deleteCurrency,
   updateCurrency,
-  upsertCurrency
+  upsertCurrency,
 };

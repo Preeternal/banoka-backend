@@ -2,6 +2,8 @@
 import https from 'https';
 import xml2js from 'xml2js';
 import iconv from 'iconv-lite';
+import { getClient } from '../utils/getClient';
+import { getCurrencies, upsertCurrency } from '../utils/operations';
 // import prisma from '../prisma';
 // import url from "url";
 
@@ -19,10 +21,15 @@ const dailyEnUrl = 'https://www.cbr.ru/scripts/XML_daily_eng.asp';
 
 const xmlParser = new xml2js.Parser();
 
+const client = getClient();
+
 const cbr = (): void => {
   const dailyUrlRequest = https.get(dailyUrl, async response => {
     const { statusCode } = response;
     const contentType = response.headers['content-type'];
+
+    const data = await client.request(getCurrencies);
+    console.log('data', data);
 
     let error;
     if (statusCode !== 200) {
@@ -117,6 +124,32 @@ const cbr = (): void => {
               //     ),
               //   },
               // });
+
+              await client.request(upsertCurrency, {
+                where: {
+                  charCode: element.CharCode[0],
+                },
+                create: {
+                  name: element.Name[0],
+                  nominal: Number(element.Nominal[0]),
+                  charCode: element.CharCode[0],
+                  value: Number(
+                    element.Value[0].match(',')
+                      ? element.Value[0].replace(',', '.')
+                      : element.Value[0]
+                  ),
+                },
+                update: {
+                  // name: element.Name[0],
+                  nominal: Number(element.Nominal[0]),
+                  // charCode: element.CharCode[0],
+                  value: Number(
+                    element.Value[0].match(',')
+                      ? element.Value[0].replace(',', '.')
+                      : element.Value[0]
+                  ),
+                },
+              });
             });
 
             // const enTrue = await prisma.query.currency({
