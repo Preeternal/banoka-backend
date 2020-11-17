@@ -3,7 +3,12 @@ import https from 'https';
 import xml2js from 'xml2js';
 import iconv from 'iconv-lite';
 import { getClient } from '../utils/getClient';
-import { getCurrencies, upsertCurrency } from '../utils/operations';
+import {
+  getCurrencies,
+  getCurrency,
+  updateCurrency,
+  upsertCurrency,
+} from '../utils/operations';
 // import prisma from '../prisma';
 // import url from "url";
 
@@ -27,9 +32,6 @@ const cbr = (): void => {
   const dailyUrlRequest = https.get(dailyUrl, async response => {
     const { statusCode } = response;
     const contentType = response.headers['content-type'];
-
-    const data = await client.request(getCurrencies);
-    console.log('data', data);
 
     let error;
     if (statusCode !== 200) {
@@ -98,33 +100,6 @@ const cbr = (): void => {
             // console.log(new Date());
             // console.dir(result.ValCurs.Valute.length);
             result.ValCurs.Valute.forEach(async (element: el) => {
-              console.log(element);
-              // await prisma.mutation.upsertCurrency({
-              //   where: {
-              //     charCode: element.CharCode[0],
-              //   },
-              //   create: {
-              //     name: element.Name[0],
-              //     nominal: Number(element.Nominal[0]),
-              //     charCode: element.CharCode[0],
-              //     value: Number(
-              //       element.Value[0].match(',')
-              //         ? element.Value[0].replace(',', '.')
-              //         : element.Value[0]
-              //     ),
-              //   },
-              //   update: {
-              //     // name: element.Name[0],
-              //     nominal: Number(element.Nominal[0]),
-              //     // charCode: element.CharCode[0],
-              //     value: Number(
-              //       element.Value[0].match(',')
-              //         ? element.Value[0].replace(',', '.')
-              //         : element.Value[0]
-              //     ),
-              //   },
-              // });
-
               await client.request(upsertCurrency, {
                 where: {
                   charCode: element.CharCode[0],
@@ -152,7 +127,7 @@ const cbr = (): void => {
               });
             });
 
-            // const enTrue = await prisma.query.currency({
+            // const enTrue = await client.request(getCurrency, {
             //   where: {
             //     nameEng: 'Belarussian Ruble',
             //   },
@@ -160,7 +135,7 @@ const cbr = (): void => {
 
             // if (!enTrue || result.ValCurs.Valute.length !== 34) {
             //   const dailyEnUrlRequest = https.get(dailyEnUrl, response => {
-            //     const xmlChunks = [];
+            //     const xmlChunks: Uint8Array[] = [];
             //     response.on('data', chunk => {
             //       xmlChunks.push(chunk);
             //     });
@@ -169,22 +144,26 @@ const cbr = (): void => {
             //         Buffer.concat(xmlChunks),
             //         'windows-1251'
             //       );
-            //       xmlParser.parseString(decodedXmlBody, (error, result) => {
-            //         if (result) {
-            //           result.ValCurs.Valute.forEach(async element => {
-            //             await prisma.mutation.updateCurrency({
-            //               where: {
-            //                 charCode: element.CharCode[0],
-            //               },
-            //               data: {
-            //                 nameEng: element.Name[0],
-            //               },
+            //       xmlParser.parseString(
+            //         decodedXmlBody,
+            //         (error: any, result: { ValCurs: { Valute: el[] } }) => {
+            //           if (result) {
+            //             result.ValCurs.Valute.forEach(async element => {
+            //               console.log(element);
+            //               // await await client.request(updateCurrency, {
+            //               //   where: {
+            //               //     charCode: element.CharCode[0],
+            //               //   },
+            //               //   data: {
+            //               //     nameEng: element.Name[0],
+            //               //   },
+            //               // });
             //             });
-            //           });
-            //         } else if (error) {
-            //           console.log(error);
+            //           } else if (error) {
+            //             console.log(error);
+            //           }
             //         }
-            //       });
+            //       );
             //     });
             //   });
             //   dailyEnUrlRequest.on('error', error => {
