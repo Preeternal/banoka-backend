@@ -127,49 +127,51 @@ const cbr = (): void => {
               });
             });
 
-            // const enTrue = await client.request(getCurrency, {
-            //   where: {
-            //     nameEng: 'Belarussian Ruble',
-            //   },
-            // });
+            const BYN = await client.request(getCurrency, {
+              where: {
+                nameEng: 'Belarussian Ruble',
+              },
+            });
 
-            // if (!enTrue || result.ValCurs.Valute.length !== 34) {
-            //   const dailyEnUrlRequest = https.get(dailyEnUrl, response => {
-            //     const xmlChunks: Uint8Array[] = [];
-            //     response.on('data', chunk => {
-            //       xmlChunks.push(chunk);
-            //     });
-            //     response.on('end', () => {
-            //       const decodedXmlBody = iconv.decode(
-            //         Buffer.concat(xmlChunks),
-            //         'windows-1251'
-            //       );
-            //       xmlParser.parseString(
-            //         decodedXmlBody,
-            //         (error: any, result: { ValCurs: { Valute: el[] } }) => {
-            //           if (result) {
-            //             result.ValCurs.Valute.forEach(async element => {
-            //               console.log(element);
-            //               // await await client.request(updateCurrency, {
-            //               //   where: {
-            //               //     charCode: element.CharCode[0],
-            //               //   },
-            //               //   data: {
-            //               //     nameEng: element.Name[0],
-            //               //   },
-            //               // });
-            //             });
-            //           } else if (error) {
-            //             console.log(error);
-            //           }
-            //         }
-            //       );
-            //     });
-            //   });
-            //   dailyEnUrlRequest.on('error', error => {
-            //     console.log(error);
-            //   });
-            // }
+            if (
+              !BYN?.currency?.nameEng ||
+              result.ValCurs.Valute.length !== 34
+            ) {
+              const dailyEnUrlRequest = https.get(dailyEnUrl, response => {
+                const xmlChunks: Uint8Array[] = [];
+                response.on('data', chunk => {
+                  xmlChunks.push(chunk);
+                });
+                response.on('end', () => {
+                  const decodedXmlBody = iconv.decode(
+                    Buffer.concat(xmlChunks),
+                    'windows-1251'
+                  );
+                  xmlParser.parseString(
+                    decodedXmlBody,
+                    (error: any, result: { ValCurs: { Valute: el[] } }) => {
+                      if (result) {
+                        result.ValCurs.Valute.forEach(async element => {
+                          await await client.request(updateCurrency, {
+                            where: {
+                              charCode: element.CharCode[0],
+                            },
+                            data: {
+                              nameEng: element.Name[0],
+                            },
+                          });
+                        });
+                      } else if (error) {
+                        console.log(error);
+                      }
+                    }
+                  );
+                });
+              });
+              dailyEnUrlRequest.on('error', error => {
+                console.log(error);
+              });
+            }
           } else if (error) {
             console.log(error);
           }

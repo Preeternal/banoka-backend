@@ -86,9 +86,9 @@ export class CurrencyResolver {
 
   @Query(() => Currency, { nullable: true })
   async currency(
-    @Arg('id', () => Int) id: number
+    @Arg('where') where: CurrencyWhereUniqueInput
   ): Promise<Currency | undefined> {
-    return await Currency.findOne(id);
+    return await Currency.findOne(where);
   }
 
   @Mutation(() => Boolean, { nullable: true })
@@ -125,5 +125,16 @@ export class CurrencyResolver {
     await Currency.update(currency.id, update);
     const updated = await Currency.findOne(currency.id);
     return updated;
+  }
+
+  @Mutation(() => Currency, { nullable: true })
+  async updateCurrency(
+    @Arg('where') where: CurrencyWhereUniqueInput,
+    @Arg('data', { nullable: true }) data: CurrencyUpdateInput
+  ): Promise<Currency | undefined> {
+    const currency = await Currency.findOne(where);
+    if (!currency) return undefined;
+    await Currency.update(currency.id, data);
+    return await Currency.findOne(currency.id);
   }
 }
