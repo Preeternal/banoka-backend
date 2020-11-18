@@ -1,4 +1,4 @@
-import { Arg, Field, InputType, Query, Resolver } from 'type-graphql';
+import { Arg, Field, InputType, Mutation, Query, Resolver } from 'type-graphql';
 import { Column, UpdateDateColumn } from 'typeorm';
 import { Err } from '../entities/Error';
 
@@ -15,7 +15,11 @@ class ErrorCreateInput {
 
 @InputType()
 class ErrorWhereUniqueInput {
-  @Field(() => String)
+  @Field({ nullable: true })
+  @Column({ unique: true })
+  id: number;
+
+  @Field(() => String, { nullable: true })
   @UpdateDateColumn()
   updatedAt: Date;
 }
@@ -43,5 +47,37 @@ export class ErrorResolver {
   @Query(() => [Err])
   async errors(): Promise<Err[] | null> {
     return await Err.find();
+  }
+
+  @Mutation(() => Err, { nullable: true })
+  async createCurrency(
+    @Arg('data') data: ErrorCreateInput
+  ): Promise<Err | null> {
+    return await Err.create({
+      ...data,
+    }).save();
+  }
+
+  @Mutation(() => Boolean, { nullable: true })
+  async deleteError(
+    @Arg('where') where: ErrorWhereUniqueInput
+  ): Promise<boolean> {
+    try {
+      await Err.delete(where);
+    } catch {
+      return false;
+    }
+    return true;
+  }
+
+  @Mutation(() => Err, { nullable: true })
+  async updateError(
+    @Arg('where') where: ErrorWhereUniqueInput,
+    @Arg('data', { nullable: true }) data: ErrorUpdateInput
+  ): Promise<Err | undefined> {
+    const currency = await Err.findOne(where);
+    if (!currency) return undefined;
+    await Err.update(currency.id, data);
+    return await Err.findOne(currency.id);
   }
 }
