@@ -87,7 +87,7 @@ const cbr = (): void => {
 
       xmlParser.parseString(
         decodedXmlBody,
-        async (error: any, result: { ValCurs: { Valute: el[] } }) => {
+        async (error: Error, result: { ValCurs: { Valute: el[] } }) => {
           if (result) {
             // const dateArray = result.ValCurs.$.Date.split(".").map(Number);
             // const date = new Date(dateArray[2], dateArray[1] - 1, dateArray[0], 12);
@@ -147,7 +147,7 @@ const cbr = (): void => {
                   );
                   xmlParser.parseString(
                     decodedXmlBody,
-                    (error: any, result: { ValCurs: { Valute: el[] } }) => {
+                    (error: Error, result: { ValCurs: { Valute: el[] } }) => {
                       if (result) {
                         result.ValCurs.Valute.forEach(async element => {
                           await await client.request(updateCurrency, {
