@@ -6,12 +6,12 @@ import { createConnection } from 'typeorm';
 import cbr from './cbr';
 import { Currency } from './entities/Currency';
 import { CurrencyResolver } from './resolvers/currency';
-import { HelloResolver } from './resolvers/hello';
+import { ErrorResolver } from './resolvers/error';
 
 const main = async () => {
   const app = express();
 
-  const conn = await createConnection({
+  await createConnection({
     type: 'postgres',
     database: 'banoka',
     username: 'postgres',
@@ -20,21 +20,9 @@ const main = async () => {
     synchronize: true,
   });
 
-  // const connectionManager = new ConnectionManager();
-
-  // const connection = connectionManager.create({
-  //   type: 'postgres',
-  //   database: 'banoka',
-  //   username: 'postgres',
-  //   password: 'myPassword',
-  //   entities: [Currency],
-  //   synchronize: true,
-  // });
-  // await connection.connect();
-
   const apolloServer = new ApolloServer({
     schema: await buildSchema({
-      resolvers: [HelloResolver, CurrencyResolver],
+      resolvers: [CurrencyResolver, ErrorResolver],
       validate: false,
     }),
   });

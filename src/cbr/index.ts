@@ -4,12 +4,10 @@ import xml2js from 'xml2js';
 import iconv from 'iconv-lite';
 import { getClient } from '../utils/getClient';
 import {
-  getCurrencies,
   getCurrency,
   updateCurrency,
   upsertCurrency,
 } from '../utils/operations';
-// import prisma from '../prisma';
 // import url from "url";
 
 type el = {

@@ -79,11 +79,6 @@ class CurrencyUpdateInput {
 
 @Resolver(Currency)
 export class CurrencyResolver {
-  @Query(() => [Currency])
-  async currencies(): Promise<Currency[] | null> {
-    return await Currency.find();
-  }
-
   @Query(() => Currency, { nullable: true })
   async currency(
     @Arg('where') where: CurrencyWhereUniqueInput
@@ -91,14 +86,9 @@ export class CurrencyResolver {
     return await Currency.findOne(where);
   }
 
-  @Mutation(() => Boolean, { nullable: true })
-  async deleteCurrency(@Arg('id') id: number): Promise<boolean> {
-    try {
-      await Currency.delete({ id });
-    } catch {
-      return false;
-    }
-    return true;
+  @Query(() => [Currency])
+  async currencies(): Promise<Currency[] | null> {
+    return await Currency.find();
   }
 
   @Mutation(() => Currency, { nullable: true })
@@ -108,6 +98,18 @@ export class CurrencyResolver {
     return await Currency.create({
       ...data,
     }).save();
+  }
+
+  @Mutation(() => Boolean, { nullable: true })
+  async deleteCurrency(
+    @Arg('where') where: CurrencyWhereUniqueInput
+  ): Promise<boolean> {
+    try {
+      await Currency.delete(where);
+    } catch {
+      return false;
+    }
+    return true;
   }
 
   @Mutation(() => Currency, { nullable: true })
