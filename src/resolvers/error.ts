@@ -86,4 +86,15 @@ export class ErrorResolver {
     await Err.update(error.id, data);
     return await Err.findOne(error.id);
   }
+
+  // @Mutation(() => Err, { nullable: true })
+  // async saveError(
+  //   @Arg('where') where: ErrorWhereUniqueInput,
+  //   @Arg('data', { nullable: true }) data: ErrorUpdateInput
+  // ): Promise<Err | undefined> {
+  //   const error = await Err.findOne(where);
+  //   if (!error) return undefined;
+  //   await Err.update(error.id, data);
+  //   return await Err.findOne(error.id);
+  // }
 }
