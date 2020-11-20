@@ -5,6 +5,7 @@ import { buildSchema } from 'type-graphql';
 import { createConnection } from 'typeorm';
 import cbr from './cbr';
 import { Currency } from './entities/Currency';
+import { Err } from './entities/Error';
 import { CurrencyResolver } from './resolvers/currency';
 import { ErrorResolver } from './resolvers/error';
 
@@ -16,7 +17,7 @@ const main = async () => {
     database: 'banoka',
     username: 'postgres',
     password: 'myPassword',
-    entities: [Currency],
+    entities: [Currency, Err],
     synchronize: true,
   });
 

@@ -1,5 +1,5 @@
 import { Arg, Field, InputType, Mutation, Query, Resolver } from 'type-graphql';
-import { Column, UpdateDateColumn } from 'typeorm';
+import { Column, getConnection, UpdateDateColumn } from 'typeorm';
 import { Err } from '../entities/Error';
 
 @InputType()
@@ -46,13 +46,19 @@ export class ErrorResolver {
 
   @Query(() => [Err])
   async errors(): Promise<Err[] | null> {
-    return await Err.find();
+    const errors = await getConnection().query(
+      `
+      select e.*
+      from err e
+      order by e."updatedAt"
+    `
+    );
+    // return await Err.find();
+    return errors;
   }
 
   @Mutation(() => Err, { nullable: true })
-  async createCurrency(
-    @Arg('data') data: ErrorCreateInput
-  ): Promise<Err | null> {
+  async createError(@Arg('data') data: ErrorCreateInput): Promise<Err | null> {
     return await Err.create({
       ...data,
     }).save();
@@ -75,9 +81,9 @@ export class ErrorResolver {
     @Arg('where') where: ErrorWhereUniqueInput,
     @Arg('data', { nullable: true }) data: ErrorUpdateInput
   ): Promise<Err | undefined> {
-    const currency = await Err.findOne(where);
-    if (!currency) return undefined;
-    await Err.update(currency.id, data);
-    return await Err.findOne(currency.id);
+    const error = await Err.findOne(where);
+    if (!error) return undefined;
+    await Err.update(error.id, data);
+    return await Err.findOne(error.id);
   }
 }
